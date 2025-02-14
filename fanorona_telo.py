@@ -1,5 +1,5 @@
 import pygame
-from ia import Noeud, Minimax, AlphaBeta  # Importer les classes pour l'IA
+from ia import Noeud, Minimax  # Importer les classes pour l'IA
 
 # Classe pour les pions
 class Pawn:
@@ -50,7 +50,7 @@ def main_game():
         intersections[2]: [intersections[1], intersections[4], intersections[5]],  # Haut droite
         intersections[3]: [intersections[0], intersections[4], intersections[6]],  # Milieu gauche
         intersections[4]: [intersections[0], intersections[1], intersections[2],
-        intersections[3], intersections[5], intersections[6], intersections[7], intersections[8]],  # Centre
+                          intersections[3], intersections[5], intersections[6], intersections[7], intersections[8]],  # Centre
         intersections[5]: [intersections[2], intersections[4], intersections[8]],  # Milieu droite
         intersections[6]: [intersections[3], intersections[4], intersections[7]],  # Bas gauche
         intersections[7]: [intersections[6], intersections[4], intersections[8]],  # Bas centre
@@ -97,7 +97,7 @@ def main_game():
             elif event.type == pygame.MOUSEBUTTONDOWN and current_player == 1:
                 x, y = pygame.mouse.get_pos()
                 for pawn in pawns:
-                    if (pawn.position[0] - x) ** 2 + (pawn.position[1] - y) ** 2 < pawn.radius ** 2:
+                    if pawn.color == BLACK and (pawn.position[0] - x) ** 2 + (pawn.position[1] - y) ** 2 < pawn.radius ** 2:
                         selected_pawn = pawn
             elif event.type == pygame.MOUSEBUTTONUP and current_player == 1:
                 if selected_pawn:
@@ -125,7 +125,7 @@ def main_game():
 
             # Trouver le meilleur mouvement avec Minimax ou Alpha-Beta
             for successeur in noeud_ia.get_successor():
-                eval = Minimax.minimax(successeur, 3, False)  # Profondeur de 3
+                eval = Minimax.minimax(successeur, 5, False)  # Profondeur de 3
                 if eval > best_eval:
                     best_eval = eval
                     best_move = successeur
