@@ -1,3 +1,2 @@
-pygame  
-pytest:wq
-
+pygame
+pytest==8.3.4

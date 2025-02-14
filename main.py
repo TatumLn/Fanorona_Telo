@@ -1,5 +1,5 @@
 import pygame
-import sys
+from fanorona_telo import main_game  # Importer la fonction du jeu
 
 # Initialisation de Pygame
 pygame.init()
@@ -13,7 +13,6 @@ pygame.display.set_caption("Fanorona Telo - Menu")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
-RED = (255, 0, 0)
 
 # Police de texte
 font = pygame.font.Font(None, 74)
@@ -34,13 +33,9 @@ quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
 def draw_menu():
     screen.fill(WHITE)
     screen.blit(title_text, title_rect)
-    
-    # Dessiner le bouton "Jouer"
-    pygame.draw.rect(screen, GRAY, play_rect.inflate(20, 10))  # Agrandir le rectangle du bouton
+    pygame.draw.rect(screen, GRAY, play_rect.inflate(20, 10))
     screen.blit(play_text, play_rect)
-    
-    # Dessiner le bouton "Quitter"
-    pygame.draw.rect(screen, GRAY, quit_rect.inflate(20, 10))  # Agrandir le rectangle du bouton
+    pygame.draw.rect(screen, GRAY, quit_rect.inflate(20, 10))
     screen.blit(quit_text, quit_rect)
 
 def main():
@@ -50,18 +45,14 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
-                sys.exit()
-            
+                return
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Vérifier si le clic est sur le bouton "Jouer"
                 if play_rect.collidepoint(event.pos):
-                    print("Lancement du jeu...")  # Ici, tu peux lancer le jeu
-                
-                # Vérifier si le clic est sur le bouton "Quitter"
+                    main_game()  # Lancer le jeu Fanorona Telo
                 if quit_rect.collidepoint(event.pos):
                     running = False
                     pygame.quit()
-                    sys.exit()
+                    return
         
         draw_menu()
         pygame.display.flip()
