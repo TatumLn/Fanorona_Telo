@@ -1,4 +1,5 @@
 import pygame
+from ia import Noeud, Minimax, AlphaBeta  # Importer les classes pour l'IA
 
 # Classe pour les pions
 class Pawn:
@@ -42,7 +43,7 @@ def main_game():
     pawns = [Pawn(BLACK, pos) for pos in intersections[:3]] + \
         [Pawn(WHITE, pos) for pos in intersections[-3:]]
 
-        # Définition des connexions valides (lignes du plateau)
+    # Définition des connexions valides (lignes du plateau)
     connections = {
         intersections[0]: [intersections[1], intersections[3], intersections[4]],  # Haut gauche
         intersections[1]: [intersections[0], intersections[2], intersections[4]],  # Haut centre
@@ -73,32 +74,32 @@ def main_game():
         for pawn in pawns:
             pawn.draw(screen)
 
-
     # Vérifier si un déplacement est valide (suivre une ligne et ne pas être occupé)
     def is_valid_move(selected_pawn, new_pos):
         if new_pos not in intersections:
             return False  # La position doit être une intersection valide
 
-    # Vérifier si l'emplacement est déjà occupé
+        # Vérifier si l'emplacement est déjà occupé
         for pawn in pawns:
             if pawn.position == new_pos:
                 return False  # Un pion est déjà là
-            return new_pos in connections[selected_pawn.position]  # Vérifie la connexion
+        return new_pos in connections[selected_pawn.position]  # Vérifie la connexion
 
     # Gestion des clics pour déplacer les pions
     selected_pawn = None
     running = True
+    current_player = 1  # 1 pour le joueur humain, 2 pour l'IA
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and current_player == 1:
                 x, y = pygame.mouse.get_pos()
                 for pawn in pawns:
                     if (pawn.position[0] - x) ** 2 + (pawn.position[1] - y) ** 2 < pawn.radius ** 2:
                         selected_pawn = pawn
-            elif event.type == pygame.MOUSEBUTTONUP:
+            elif event.type == pygame.MOUSEBUTTONUP and current_player == 1:
                 if selected_pawn:
                     x, y = pygame.mouse.get_pos()
                     # Trouver la position d'intersection la plus proche
@@ -106,7 +107,45 @@ def main_game():
                     # Vérifier si le déplacement est valide
                     if is_valid_move(selected_pawn, closest_pos):
                         selected_pawn.position = closest_pos
+                        current_player = 2  # Passer à l'IA
                     selected_pawn = None
+
+        # Tour de l'IA
+        if current_player == 2:
+            # Convertir le plateau en représentation pour l'IA
+            plateau_ia = [[0 for _ in range(3)] for _ in range(3)]
+            for pawn in pawns:
+                row = (pawn.position[1] - OFFSET_Y) // CELL_SIZE
+                col = (pawn.position[0] - OFFSET_X) // CELL_SIZE
+                plateau_ia[row][col] = 1 if pawn.color == BLACK else 2
+
+            noeud_ia = Noeud(plateau_ia, 2)
+            best_move = None
+            best_eval = -float('inf')
+
+            # Trouver le meilleur mouvement avec Minimax ou Alpha-Beta
+            for successeur in noeud_ia.get_successor():
+                eval = Minimax.minimax(successeur, 3, False)  # Profondeur de 3
+                if eval > best_eval:
+                    best_eval = eval
+                    best_move = successeur
+
+            # Appliquer le meilleur mouvement
+            if best_move:
+                for pawn in pawns:
+                    if pawn.color == WHITE:
+                        row = (pawn.position[1] - OFFSET_Y) // CELL_SIZE
+                        col = (pawn.position[0] - OFFSET_X) // CELL_SIZE
+                        if best_move.plateau[row][col] == 2:
+                            new_row, new_col = None, None
+                            for i in range(3):
+                                for j in range(3):
+                                    if best_move.plateau[i][j] == 2 and (i != row or j != col):
+                                        new_row, new_col = i, j
+                            if new_row is not None and new_col is not None:
+                                pawn.position = intersections[new_row * 3 + new_col]
+                                break
+                current_player = 1  # Revenir au joueur humain
 
         draw_board()
         draw_pawns()

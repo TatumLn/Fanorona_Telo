@@ -5,7 +5,7 @@ from fanorona_telo import main_game  # Importer la fonction du jeu
 pygame.init()
 
 # Définir les dimensions de la fenêtre
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 500, 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Fanorona Telo - Menu")
 
